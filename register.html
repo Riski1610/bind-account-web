@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrasi Account</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 450px;
+            margin: 30px auto;
+        }
+        .card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            margin: 0 0 10px;
+            text-align: center;
+            color: #333;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+        .btn-small {
+            font-size: 13px;
+            padding: 8px 12px;
+            width: auto;
+            margin-top: 0;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        #msg {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+            border-left: 4px solid;
+        }
+        #msg.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .msg-success {
+            background: #c8e6c9;
+            color: #2e7d32;
+            border-color: #2e7d32;
+        }
+        .msg-error {
+            background: #ffcdd2;
+            color: #c62828;
+            border-color: #c62828;
+        }
+        .msg-info {
+            background: #bbdefb;
+            color: #1565c0;
+            border-color: #1565c0;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .otp-input-group {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .otp-input {
+            width: 45px;
+            height: 45px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .otp-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .otp-timer {
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .otp-timer.danger {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: #667eea;
+            color: #fff;
+            border-color: #667eea;
+        }
+        .info-box {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+            margin-top: 15px;
+        }
+        .user-list {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .user-item {
+            background: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            font-size: 13px;
+        }
+        .user-item strong {
+            color: #333;
+        }
+        .user-item .phone {
+            color: #666;
+        }
+        .user-item .status {
+            display: inline-block;
+            background: #c8e6c9;
+            color: #2e7d32;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>📱 Registrasi Account</h2>
+            <p class="subtitle">Daftar akun baru dengan mudah</p>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('register')">Registrasi</button>
+                <button class="tab-btn" onclick="switchTab('users')">📋 Users</button>
+            </div>
+
+            <!-- REGISTRASI SECTION -->
+            <div id="register-section" class="section active">
+                <div id="form-section">
+                    <div class="form-group">
+                        <label>Nomor HP</label>
+                        <input id="phone" type="tel" inputmode="numeric" placeholder="Contoh: 081234567890">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input id="password" type="password" placeholder="Minimal 6 karakter">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Konfirmasi Password</label>
+                        <input id="confirm" type="password" placeholder="Ulangi password">
+                    </div>
+
+                    <button class="btn-primary" onclick="submitRegister()">
+                        <span>✓</span> Lanjut ke OTP
+                    </button>
+                </div>
+
+                <div id="otp-section" style="display: none;">
+                    <div class="info-box">
+                        <strong>📱 Nomor HP Terdaftar:</strong><br>
+                        <code id="displayPhone" style="font-size: 14px;"></code>
+                    </div>
+
+                    <p style="text-align: center; margin-top: 20px; color: #666;">
+                        Masukkan 6 digit OTP:
+                    </p>
+
+                    <div class="otp-input-group" id="otpInputs"></div>
+
+                    <div class="otp-timer">
+                        ⏱️ Waktu: <span id="timer">300</span> detik
+                    </div>
+
+                    <button class="btn-primary" onclick="verifyOTP()">
+                        <span>✓</span> Verifikasi OTP
+                    </button>
+
+                    <button class="btn-secondary btn-small" onclick="resendOTP()" style="width: 100%; margin-top: 10px;">
+                        🔄 Kirim Ulang OTP
+                    </button>
+
+                    <button class="btn-secondary btn-small" onclick="backToForm()" style="width: 100%; margin-top: 10px;">
+                        ← Kembali
+                    </button>
+                </div>
+
+                <div id="msg"></div>
+            </div>
+
+            <!-- USERS SECTION -->
+            <div id="users-section" class="section">
+                <p style="text-align: center; color: #666; font-size: 14px;">
+                    📊 Daftar pengguna yang telah terdaftar:
+                </p>
+                <div class="user-list" id="usersList">
+                    <p style="text-align: center; color: #999; font-size: 13px;">Tidak ada user terdaftar</p>
+                </div>
+
+                <button class="btn-secondary" onclick="exportUsers()" style="margin-top: 15px;">
+                    <span>📥</span> Export ke TXT
+                </button>
+
+                <button class="btn-secondary" onclick="clearAllUsers()" style="margin-top: 10px;">
+                    <span>🗑️</span> Hapus Semua User
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPhone = '';
+        let currentPassword = '';
+        let currentOTP = '';
+        let otpExpiry = null;
+        let timerInterval = null;
+
+        // Initialize users array
+        function getUsers() {
+            const users = localStorage.getItem('registeredUsers');
+            return users ? JSON.parse(users) : [];
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('registeredUsers', JSON.stringify(users));
+        }
+
+        function switchTab(tab) {
+            // Hide all sections
+            document.getElementById('register-section').classList.remove('active');
+            document.getElementById('users-section').classList.remove('active');
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected section and mark tab as active
+            if (tab === 'register') {
+                document.getElementById('register-section').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else if (tab === 'users') {
+                document.getElementById('users-section').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                loadUsersList();
+            }
+        }
+
+        function showMsg(message, type) {
+            const msg = document.getElementById('msg');
+            msg.textContent = message;
+            msg.className = `show msg-${type}`;
+        }
+
+        function hideMsg() {
+            document.getElementById('msg').classList.remove('show');
+        }
+
+        function submitRegister() {
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm').value;
+
+            // Validasi
+            if (!phone) {
+                showMsg('❌ Nomor HP belum diisi', 'error');
+                return;
+            }
+
+            if (!/^\d{10,}$/.test(phone)) {
+                showMsg('❌ Nomor HP tidak valid (minimal 10 digit)', 'error');
+                return;
+            }
+
+            if (!password) {
+                showMsg('❌ Password belum diisi', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMsg('❌ Password minimal 6 karakter', 'error');
+                return;
+            }
+
+            if (password !== confirm) {
+                showMsg('❌ Konfirmasi password tidak sama', 'error');
+                return;
+            }
+
+            // Cek apakah nomor sudah terdaftar
+            const users = getUsers();
+            if (users.some(u => u.phone === phone)) {
+                showMsg('❌ Nomor HP sudah terdaftar', 'error');
+                return;
+            }
+
+            // Simpan data temporary
+            currentPhone = phone;
+            currentPassword = password;
+
+            // Generate OTP
+            generateOTP();
+
+            // Tampilkan OTP Section
+            document.getElementById('form-section').style.display = 'none';
+            document.getElementById('otp-section').style.display = 'block';
+            document.getElementById('displayPhone').textContent = phone;
+            hideMsg();
+        }
+
+        function generateOTP() {
+            currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            otpExpiry = Date.now() + (5 * 60 * 1000); // 5 menit
+            
+            // Tampilkan OTP (untuk testing)
+            showMsg(`✅ OTP Anda: <strong>${currentOTP}</strong> (Berlaku 5 menit)`, 'info');
+            
+            // Generate input fields
+            generateOTPInputs();
+            
+            // Start timer
+            startTimer();
+        }
+
+        function generateOTPInputs() {
+            const container = document.getElementById('otpInputs');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 6; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.inputMode = 'numeric';
+                input.maxLength = '1';
+                input.className = 'otp-input';
+                input.id = `otp-${i}`;
+                
+                input.addEventListener('input', function(e) {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if (this.value && i < 5) {
+                        document.getElementById(`otp-${i + 1}`).focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !this.value && i > 0) {
+                        document.getElementById(`otp-${i - 1}`).focus();
+                    }
+                });
+                
+                container.appendChild(input);
+            }
+            
+            document.getElementById('otp-0').focus();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimer();
+            
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            const remaining = Math.max(0, Math.floor((otpExpiry - Date.now()) / 1000));
+            const timerEl = document.getElementById('timer');
+            timerEl.textContent = remaining;
+            
+            if (remaining <= 60) {
+                timerEl.parentElement.classList.add('danger');
+            }
+            
+            if (remaining === 0) {
+                clearInterval(timerInterval);
+                showMsg('⏰ OTP sudah expired! Silakan kirim ulang.', 'error');
+                document.querySelectorAll('.otp-input').forEach(inp => inp.disabled = true);
+            }
+        }
+
+        function verifyOTP() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const inputOTP = Array.from(otpInputs).map(inp => inp.value).join('');
+
+            if (inputOTP.length !== 6) {
+                showMsg('❌ Silakan masukkan 6 digit OTP', 'error');
+                return;
+            }
+
+            if (inputOTP !== currentOTP) {
+                showMsg('❌ OTP tidak sesuai', 'error');
+                return;
+            }
+
+            if (Date.now() > otpExpiry) {
+                showMsg('⏰ OTP sudah expired', 'error');
+                return;
+            }
+
+            // OTP valid - simpan user
+            const users = getUsers();
+            const newUser = {
+                id: Date.now(),
+                phone: currentPhone,
+                password: currentPassword,
+                registeredAt: new Date().toLocaleString('id-ID')
+            };
+            
+            users.push(newUser);
+            saveUsers(users);
+
+            // Clear form
+            clearInterval(timerInterval);
+            document.getElementById('phone').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('confirm').value = '';
+
+            // Reset sections
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('otp-section').style.display = 'none';
+
+            showMsg(`✅ Registrasi berhasil!\n\nNomor HP: ${currentPhone}\nAkun Anda sudah siap digunakan.`, 'success');
+        }
+
+        function resendOTP() {
+            generateOTP();
+            showMsg(`✅ OTP baru telah dikirim: <strong>${currentOTP}</strong>`, 'info');
+        }
+
+        function backToForm() {
+            clearInterval(timerInterval);
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('otp-section').style.display = 'none';
+            hideMsg();
+        }
+
+        function loadUsersList() {
+            const users = getUsers();
+            const usersList = document.getElementById('usersList');
+
+            if (users.length === 0) {
+                usersList.innerHTML = '<p style="text-align: center; color: #999; font-size: 13px;">Tidak ada user terdaftar</p>';
+                return;
+            }
+
+            usersList.innerHTML = users.map((user, idx) => `
+                <div class="user-item">
+                    <strong>${idx + 1}. ${user.phone}</strong>
+                    <div class="phone">📱 Nomor: ${user.phone}</div>
+                    <div style="margin-top: 5px; font-size: 12px; color: #999;">
+                        Terdaftar: ${user.registeredAt}
+                    </div>
+                    <div class="status">✓ Aktif</div>
+                </div>
+            `).join('');
+        }
+
+        function exportUsers() {
+            const users = getUsers();
+
+            if (users.length === 0) {
+                alert('Tidak ada user untuk di-export');
+                return;
+            }
+
+            let txtContent = 'DAFTAR PENGGUNA TERDAFTAR\n';
+            txtContent += '=========================\n\n';
+            
+            users.forEach((user, idx) => {
+                txtContent += `${idx + 1}. Nomor HP: ${user.phone}\n`;
+                txtContent += `   Password: ${user.password}\n`;
+                txtContent += `   Terdaftar: ${user.registeredAt}\n`;
+                txtContent += `   Status: Aktif\n\n`;
+            });
+
+            txtContent += `Total User: ${users.length}\n`;
+            txtContent += `Export Date: ${new Date().toLocaleString('id-ID')}`;
+
+            // Download as txt
+            const blob = new Blob([txtContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `users_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAllUsers() {
+            if (confirm('⚠️ Yakin hapus SEMUA user? Tindakan ini tidak bisa dibatalkan!')) {
+                localStorage.removeItem('registeredUsers');
+                loadUsersList();
+                alert('✓ Semua user sudah dihapus');
+            }
+        }
+
+        // Load users on tab switch
+        document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+            if (idx === 1) {
+                btn.addEventListener('click', loadUsersList);
+            }
+        });
+    </script>
+</body>
+</html>
