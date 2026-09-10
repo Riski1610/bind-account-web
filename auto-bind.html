@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Auto Bind Helper</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+        }
+        .box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            margin: 0 0 10px;
+            color: #333;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .btn-danger {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #ee5a52;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            display: none;
+        }
+        #result.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .result-success {
+            background: #c8e6c9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+        .result-error {
+            background: #ffcdd2;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+        .result-info {
+            background: #bbdefb;
+            color: #1565c0;
+            border-left: 4px solid #1565c0;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .data-item {
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .info-box {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+            margin-top: 15px;
+        }
+        .emoji {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box">
+            <h2><span class="emoji">🔗</span> Auto Bind Helper</h2>
+            <p class="subtitle">Kelola data bind account Anda dengan mudah</p>
+            
+            <div class="button-group">
+                <button class="btn-primary" onclick="autoBind()">
+                    <span class="emoji">✓</span> Copy Data Bind ke Clipboard
+                </button>
+                <button class="btn-secondary" onclick="checkData()">
+                    <span class="emoji">📋</span> Lihat Data Tersimpan
+                </button>
+                <button class="btn-danger" onclick="clearData()">
+                    <span class="emoji">✗</span> Hapus Data
+                </button>
+            </div>
+            
+            <div id="result"></div>
+
+            <div class="info-box">
+                <strong>📖 Cara Pakai:</strong><br>
+                1. Klik "Copy Data Bind" untuk salin nomor HP & password<br>
+                2. Buka tab game dan paste ke form<br>
+                3. Klik "Lihat Data" untuk cek apa ada data tersimpan<br>
+                4. Klik "Hapus Data" jika sudah selesai bind
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showResult(message, type) {
+            const result = document.getElementById('result');
+            result.innerHTML = message;
+            result.className = `show result-${type}`;
+        }
+
+        function autoBind() {
+            const bindData = {
+                phone: localStorage.getItem('bindPhone'),
+                password: localStorage.getItem('bindPassword')
+            };
+
+            if (!bindData.phone || !bindData.password) {
+                showResult(
+                    `<strong>❌ Tidak ada data bind</strong><br>
+                    Silakan isi form di <strong>web ringan</strong> terlebih dahulu, 
+                    lalu kembali ke halaman ini.`,
+                    'error'
+                );
+                return;
+            }
+
+            // Copy ke clipboard
+            const text = `${bindData.phone}\n${bindData.password}`;
+            navigator.clipboard.writeText(text).then(() => {
+                showResult(
+                    `<strong>✅ Data berhasil disalin ke Clipboard!</strong><br><br>
+                    <div class="data-item">
+                        <span class="label">📱 Nomor HP:</span><br>
+                        <code>${bindData.phone}</code>
+                    </div>
+                    <div class="data-item">
+                        <span class="label">🔑 Password:</span><br>
+                        <code>••••••••</code>
+                    </div>
+                    <br>
+                    <small>Buka tab game dan paste data tersebut ke form login/bind.</small>`,
+                    'success'
+                );
+            }).catch(() => {
+                showResult(
+                    `<strong>⚠️ Gagal copy ke clipboard</strong><br>
+                    Nomor HP: <code>${bindData.phone}</code><br>
+                    Password: <code>***</code><br>
+                    Copy manual jika diperlukan.`,
+                    'error'
+                );
+            });
+        }
+
+        function clearData() {
+            if (confirm('⚠️ Yakin hapus semua data bind?\n\nTindakan ini tidak bisa dibatalkan!')) {
+                localStorage.removeItem('bindPhone');
+                localStorage.removeItem('bindPassword');
+                localStorage.removeItem('bindTimestamp');
+                
+                showResult(
+                    `<strong>✓ Data sudah dihapus</strong><br>
+                    Semua informasi bind telah dihapus dari storage.`,
+                    'success'
+                );
+            }
+        }
+
+        function checkData() {
+            const phone = localStorage.getItem('bindPhone');
+            const password = localStorage.getItem('bindPassword');
+            const timestamp = localStorage.getItem('bindTimestamp');
+
+            if (!phone && !password) {
+                showResult(
+                    `<strong>⚠️ Tidak ada data tersimpan</strong><br>
+                    Storage kosong. Isi form di web ringan untuk menyimpan data.`,
+                    'error'
+                );
+                return;
+            }
+
+            const date = timestamp ? new Date(parseInt(timestamp)).toLocaleString('id-ID') : '-';
+            
+            showResult(
+                `<strong>📊 Data Tersimpan:</strong><br><br>
+                <div class="data-item">
+                    <span class="label">📱 Nomor HP:</span><br>
+                    <code>${phone || '-'}</code>
+                </div>
+                <div class="data-item">
+                    <span class="label">🔑 Password:</span><br>
+                    <code>${password ? '••••••••' : '-'}</code>
+                </div>
+                <div class="data-item">
+                    <span class="label">⏰ Waktu Simpan:</span><br>
+                    <code>${date}</code>
+                </div>`,
+                'info'
+            );
+        }
+
+        // Auto-check saat halaman load
+        window.addEventListener('load', function() {
+            const phone = localStorage.getItem('bindPhone');
+            if (phone) {
+                showResult(
+                    `<strong>✓ Data ditemukan!</strong><br>
+                    Silakan klik "Copy Data Bind" untuk mulai proses.`,
+                    'success'
+                );
+            }
+        });
+    </script>
+</body>
+</html>
